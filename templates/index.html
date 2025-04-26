@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News App</title>
+</head>
+<body>
+    <h1>Create New Article</h1>
+    <form id="article-form">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+
+        <label for="content">Article Content:</label><br>
+        <textarea id="content" name="content" rows="4" cols="50" required></textarea><br><br>
+
+        <!-- Image input -->
+        <label for="image">Select Image:</label><br>
+        <input type="file" id="image" name="image"><br><br>
+
+        <!-- Where the preview will show -->
+        <img id="preview" src="" alt="Image preview" style="max-width: 300px; display: none;">
+
+
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="response-message"></div>
+
+    <script>
+        // Get the form and the response message div
+        const form = document.getElementById('article-form');
+        const responseMessage = document.getElementById('response-message');
+        
+
+        document.getElementById('image').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('preview');
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';  // Make sure it's visible
+            };
+
+            reader.readAsDataURL(file); // Converts file to base64 so browser can show it
+        }
+        });
+        // Submit form via JavaScript
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();  // Prevent the form from reloading the page
+
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const image = document.getElementById('image').files[0];  // Get the selected file
+
+
+            // Check if the title is provided
+            if (!title.trim()) {
+                responseMessage.innerHTML = "<span style='color: red;'>Title is required!</span>";
+                return;
+            }
+
+                   // Create a FormData object to handle both the text and the file
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('content', content);
+        if (image) {
+            formData.append('image', image);  // Append the image file if it exists
+        }
+
+        // Send the POST request to Flask API
+        try {
+            const response = await fetch('http://127.0.0.1:5000/articles', {
+                method: 'POST',
+                body: formData  // Send the form data including the file
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                responseMessage.innerHTML = "<span style='color: green;'>Article saved successfully!</span>";
+                form.reset();  // Reset form after successful submission
+            } else {
+                responseMessage.innerHTML = "<span style='color: red;'>Failed to save the article!</span>";
+            }
+        } catch (error) {
+            responseMessage.innerHTML = "<span style='color: red;'>Error: " + error.message + "</span>";
+        }
+    });
+</script>
+</body>
+</html>
