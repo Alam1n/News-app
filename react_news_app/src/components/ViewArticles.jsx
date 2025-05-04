@@ -29,7 +29,7 @@ export default function ViewArticles() {
                 ) : (
                     articles.map(article => {
                         const rawPath = article.image_path.replace(/\\/g, "/");
-                        const imgSrc = `https://alaminapi.pythonanywhere.com${rawPath}`;
+                        const imgSrc = `https://alaminapi.pythonanywhere.com/${rawPath}`;
                         
                         // ✅ This is where the log should be
                         console.log('Image Path:', imgSrc);
@@ -56,6 +56,9 @@ export default function ViewArticles() {
                                 <div className="card-title" style={{ fontWeight: 'bold' }}>
                                     {article.title}
                                 </div>
+                                <div className="card-category" style={{ fontSize: '13px', color: '#555' }}>
+                                    {article.category}
+                                 </div>
                                 <div className="card-time" style={{ fontSize: '12px', color: '#777' }}>
                                     {new Date(article.created_at).toLocaleString()}
                                 </div>
